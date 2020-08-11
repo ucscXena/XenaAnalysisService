@@ -50,25 +50,8 @@ function(msg=""){
 #' @post /echo
 function(req){
   formContents <- Rook::Multipart$parse(req)
-  #post <- Rook::Multipart$parse(req)
-  #list(str(formContents$tempfile))
-  poststr <- paste(capture.output(str(formContents),file=NULL),collapse='\n')
-  print("A")
-  print(formContents)
-  file.create("temp.gmt")
-  print("A.1")
-  print(str(formContents$upload$tempfile))
   fileName <- formContents$upload$tempfile
   outputfile = readChar(fileName, file.info(fileName)$size)
-  print(outputfile)
-  print("A.2")
-  file.copy(formContents$upload$tempfile,"temp.gmt")
-  print("B")
-  print(poststr)
-  print("C")
-  #list(poststr$upload$tempfile)
-  list(formContents)
-  #somefile <- readLines(con = formContents$upload$tempfile)
   list(outputfile)
 
 }
