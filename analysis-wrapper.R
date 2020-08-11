@@ -30,14 +30,6 @@
 #geneset_gmt_filepath <- args[1]
 #tmp_expr_data_filepath <- args[2]
 #outfile <- args[3]
-#if(length(args)>3){
-#  analysis_method <- args[4]
-#}else{
-#  analysis_method <- "BPA"
-#}
-#
-#
-#if(analysis_method == "BPA"){
 
 #* @param msg The message to echo
 #curl -v -F foo=bar -F upload=@test-data/Xena_manual_pathways.gmt http://localhost:8000/echo
@@ -52,15 +44,10 @@ function(msg=""){
 function(req){
   formContents <- Rook::Multipart$parse(req)
   outputFile<-file("output.csv")
-  #write("",outputFile)
-  #do_bpa_analysis("temp.gmt","temp.tpm","output.csv")
+  write("",outputFile)
   do_bpa_analysis(formContents$gmtdata$tempfile,formContents$tpmdata$tempfile,"output.csv")
-  #output = readChar(outputFile, file.info(outputFile)$size)
-  #list(msg="Output file written ")
-  list(msg = paste0("Output file written to : '", outputFile, "'"))
-  #print("C")
-  #print(output)
-  #list(output)
+  outputText <- read.csv(outputFile)
+  list(msg = outputText)
 }
 
 do_bpa_analysis <- function(geneset_gmt_filepath,tmp_expr_data_filepath,outfile){
@@ -98,10 +85,6 @@ do_bpa_analysis <- function(geneset_gmt_filepath,tmp_expr_data_filepath,outfile)
   write.table(nes, file = outfile, quote = F, sep='\t', col.names = NA, row.names = T)
 
 }
-  
-#}else{
-#  print("analysis method has to be one of: BPA (default)")
-#}
 
 
 # get command line input
