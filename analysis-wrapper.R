@@ -107,6 +107,17 @@ do_bpa_analysis <- function(geneset_gmt_filepath,tmp_expr_data_filepath,outfile)
 
 
 
+# get command line input
+args <- commandArgs(trailingOnly=TRUE)
+geneset_gmt_filepath <- args[1]
+tmp_expr_data_filepath <- args[2]
+outfile <- args[3]
+if(length(args)>3){
+  analysis_method <- args[4]
+}else{
+  analysis_method <- "BPA"
+}
+do_bpa_analysis(geneset_gmt_filepath,tmp_expr_data_filepath,outfile )
 
 
 
