@@ -47,12 +47,22 @@ function(msg=""){
 }
 
 #* @param msg The message to echo
-#' @post /echo
+#curl -v -F tpmdata=@test-data/TCGA-CHOL_logtpm_forTesting.tsv -F gmtdata=@test-data/Xena_manual_pathways.gmt http://localhost:8000/bpa_analysis
+#' @post /bpa_analysis
 function(req){
   formContents <- Rook::Multipart$parse(req)
-  fileName <- formContents$upload$tempfile
-  outputfile = readChar(fileName, file.info(fileName)$size)
-  list(outputfile)
+  gmtFileName <- formContents$gmtdata$tempfile
+  gmtFile<-file("temp.gmt")
+  writeLines(readChar(gmtFileName, file.info(gmtFileName)$size),gmtFile)
+
+  tpmFileName <- formContents$tpmdata$tempfile
+  tpmFile<-file("temp.tpm")
+  writeLines(readChar(tpmFileName, file.info(tpmFileName)$size),tpmFile)
+  outputFile<-file("output.csv")
+  write("",outputFile)
+  do_bpa_analysis("temp.gmt","temp.tpm","output.csv")
+
+  list(outputFile)
 
 }
 
