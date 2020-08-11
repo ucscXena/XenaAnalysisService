@@ -51,19 +51,16 @@ function(msg=""){
 #' @post /bpa_analysis
 function(req){
   formContents <- Rook::Multipart$parse(req)
-  gmtFileName <- formContents$gmtdata$tempfile
-  gmtFile<-file("temp.gmt")
-  writeLines(readChar(gmtFileName, file.info(gmtFileName)$size),gmtFile)
-
-  tpmFileName <- formContents$tpmdata$tempfile
-  tpmFile<-file("temp.tpm")
-  writeLines(readChar(tpmFileName, file.info(tpmFileName)$size),tpmFile)
   outputFile<-file("output.csv")
-  write("",outputFile)
-  do_bpa_analysis("temp.gmt","temp.tpm","output.csv")
-
-  list(outputFile)
-
+  #write("",outputFile)
+  #do_bpa_analysis("temp.gmt","temp.tpm","output.csv")
+  print("A")
+  do_bpa_analysis(formContents$gmtdata$tempfile,formContents$tpmdata$tempfile,"output.csv")
+  print("B")
+  output = readChar(outputFile, file.info(outputFile)$size)
+  print("C")
+  print(output)
+  list(output)
 }
 
 do_bpa_analysis <- function(geneset_gmt_filepath,tmp_expr_data_filepath,outfile){
@@ -78,7 +75,7 @@ do_bpa_analysis <- function(geneset_gmt_filepath,tmp_expr_data_filepath,outfile)
     linesplit <- strsplit(line,split="\t",fixed = T)[[1]]
     gs_name <- linesplit[1]
     gs_description <- linesplit[2]
-    if(gs_description != ""){
+    if(!is.na(gs_description) &&  gs_description != ""){
       gs_name <- paste0(gs_name," (",gs_description,")")
     }
     gs_genes <- linesplit[3:length(linesplit),drop = F]
@@ -90,16 +87,13 @@ do_bpa_analysis <- function(geneset_gmt_filepath,tmp_expr_data_filepath,outfile)
     gs_list <- list(tfmode = tfmode,likelihood = likelihood)
     pws_list[[gs_name]] <- gs_list
   }
-  
-  
+
   # read in expression data
   tpm <- as.matrix(read.table(tmp_expr_data_filepath,sep = "\t", header = T, row.names = 1, check.names = F))
-  
-  
+
   # transform gene expression to pathway activities
   nes <- aREA(tpm, pws_list, minsize = 2)$nes
-  
-  
+
   # write pathway activity matrix to files
   write.table(nes, file = outfile, quote = F, sep='\t', col.names = NA, row.names = T)
 
