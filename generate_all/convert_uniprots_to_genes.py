@@ -41,4 +41,9 @@ def convert_gmt_uniprots(input_file_name):
             output_file.write(output_line_str)
 
 
+print("EXPERIMENTS\n")
 convert_gmt_uniprots(input_file_name='9606-bp-experimental.gmt')
+print("COMPUTATIONAL\n")
+convert_gmt_uniprots(input_file_name='9606-bp-computational.gmt')
+print("ALL\n")
+convert_gmt_uniprots(input_file_name='9606-bp-all.gmt')
