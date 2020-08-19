@@ -26,5 +26,5 @@ do
 
   Rscript ../analysis-wrapper.R $1 TCGA-${COHORT}_tpm_tab.tsv geneset_output_${COHORT}.tsv
 
-   echo "DONE processing $COHORT -> ${geneset_output_${COHORT}.tsv}"
+   echo "DONE processing $COHORT -> geneset_output_${COHORT}.tsv"
 done
