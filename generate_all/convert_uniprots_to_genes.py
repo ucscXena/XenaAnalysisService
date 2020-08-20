@@ -23,26 +23,39 @@ def individual_conversion(gene_batch):
 
 def do_conversion(genes):
     counter = 0
-    return_genes = []
+    gene_map = {}
     gene_length = len(genes)
     print("converting genes " + str(gene_length))
     while counter < gene_length:
-        return_genes.extend(individual_conversion(genes[counter:counter + batch_size]))
+        # TODO: this is a bug  as we need to conver the string
+        # assert 0 == 1
+        converted = individual_conversion(genes[counter:counter + batch_size])
+        for gene_entry in converted:
+            gene_array = gene_entry.split("\t")
+            if not gene_array[0].startswith("From", 0) and len(gene_array) > 1:
+                gene_map[gene_array[0]] = gene_array[1]
+        # return_genes
+        # TODO: add to return genes
         counter += batch_size
         print("at : " + str(counter / gene_length * 100.0) + "%")
 
-    return return_genes
+    return gene_map
 
 
 def convert_uniprot(input_genes):
     gene_string = ' '.join(input_genes[0:])
-    output_genes = do_conversion(genes=gene_string)
-    print("output gnes: " + str(len(output_genes)))
-    gene_map = {}
-    for gene_entry in output_genes:
-        gene_array = gene_entry.split("\t")
-        if not gene_array[0].startswith("From", 0) and len(gene_array) > 1:
-            gene_map[gene_array[0]] = gene_array[1]
+    gene_map =  do_conversion(genes=gene_string)
+    print("gene map output: " + str(gene_map))
+    # print("output gnes: " + str(len(output_genes)))
+    # gene_map = {}
+    # print("type genes: " + str(type(output_genes)))
+    # print("outpuit genes: " + str(output_genes))
+    # for gene_entry in output_genes:
+    #     # print(gene_entry)
+    #     # print('gene entry: '+str(gene_entry) + " " + str(type(gene_entry)))
+    #     gene_array = gene_entry.split("\t")
+    #     if not gene_array[0].startswith("From", 0) and len(gene_array) > 1:
+    #         gene_map[gene_array[0]] = gene_array[1]
 
     return gene_map
 
@@ -99,8 +112,8 @@ def get_genes_from_gmt(input_file_name):
 
 print("GENE GENES\n")
 genes = []
-# genes.extend(get_genes_from_gmt(input_file_name='test1.gmt'))
-genes.extend(get_genes_from_gmt(input_file_name='9606-bp-experimental.gmt'))
+genes.extend(get_genes_from_gmt(input_file_name='test1.gmt'))
+# genes.extend(get_genes_from_gmt(input_file_name='9606-bp-experimental.gmt'))
 # genes.extend(get_genes_from_gmt(input_file_name='9606-bp-computational.gmt'))
 # genes.extend(get_genes_from_gmt(input_file_name='9606-bp-all.gmt'))
 
@@ -119,8 +132,10 @@ print("UNIQUE GENES: " + str(len(unique_genes)))
 flattened_conversion_map = convert_uniprot(unique_genes)
 
 print("KEYS IN CONVERSION MAP: " + str(len(flattened_conversion_map.keys())))
+print(flattened_conversion_map)
+print("the key? -> " + " ".join(flattened_conversion_map.keys()))
 
-# convert_gmt_uniprots(input_file_name='test1.gmt', conversion_map=flattened_conversion_map)
-convert_gmt_uniprots(input_file_name='9606-bp-experimental.gmt', conversion_map=flattened_conversion_map)
+convert_gmt_uniprots(input_file_name='test1.gmt', conversion_map=flattened_conversion_map)
+# convert_gmt_uniprots(input_file_name='9606-bp-experimental.gmt', conversion_map=flattened_conversion_map)
 # convert_gmt_uniprots(input_file_name='9606-bp-computational.gmt', conversion_map=flattened_conversion_map)
 # convert_gmt_uniprots(input_file_name='9606-bp-all.gmt', conversion_map=flattened_conversion_map)
