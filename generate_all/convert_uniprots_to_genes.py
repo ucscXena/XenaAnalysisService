@@ -1,3 +1,4 @@
+import sys
 import urllib.parse
 import urllib.request
 
@@ -49,22 +50,21 @@ def do_replace_genes(input_genes, conversion_map):
         try:
             output_genes.append(conversion_map[gene.replace('UniProtKB:', '')])
         except:
-            print("problem handling gene: " + gene)
-            output_genes.append(individual_conversion([gene]))
+            print("problem handling gene: " + gene + " so ignoring")
+            # output_genes.append(individual_conversion([gene]))
     return output_genes
 
 
 def convert_gmt_uniprots(input_file_name, conversion_map):
     output_file_name = input_file_name + "_converted.tsv"
     output_file = open(output_file_name, "w")
-    print("writing to "+output_file_name)
+    print("writing to " + output_file_name)
     with open(input_file_name, "r") as a_file:
         for line in a_file:
             stripped_tabbed_line = line.strip().split("\t")
             gene_set_name = stripped_tabbed_line[0].split("%BP%")[0]
             gene_set_goid = stripped_tabbed_line[0].split("%BP%")[1]
             output_file.write(gene_set_name + "\t" + gene_set_goid + "\t")
-            # print(str(stripped_tabbed_line))
             replaced_genes = do_replace_genes(input_genes=stripped_tabbed_line[1:], conversion_map=conversion_map)
             output_file.write(' '.join(replaced_genes) + "\n")
     output_file.close()
@@ -79,34 +79,22 @@ def get_genes_from_gmt(input_file_name):
     return genes
 
 
-# def build_db_uniprots(input_db, input_file_name):
-#     with open(input_file_name, "r") as a_file:
-#         for line in a_file:
-#             stripped_tabbed_line = line.strip().split("\t")
-#             output_line_str = ' '.join(stripped_tabbed_line[1:]).replace('UniProtKB:', '')
-#             # output_genes = do_conversion(output_line_str)
-#             for out_gene in output_genes.split("\n"):
-#                 # formatted_genes = []
-#                 if not out_gene.startswith("From", 0):
-#                     tframe = out_gene.split("\t")
-#                     if len(tframe) > 1:
-#                         output_line_str += tframe[1] + " "
-#             output_line_str += "\n"
-#             # output_file.write(output_line_str)
+print("input arguments: " + str(sys.argv))
+if len(sys.argv) < 2:
+    print("exiting, need file argument")
+    exit(1)
 
+input_gmt_file = sys.argv[1]
+print("converting gmt file: " + input_gmt_file)
 
 print("GENE GENES\n")
 genes = []
-genes.extend(get_genes_from_gmt(input_file_name='test1.gmt'))
-# genes.extend(get_genes_from_gmt(input_file_name='9606-bp-experimental.gmt'))
-# genes.extend(get_genes_from_gmt(input_file_name='9606-bp-computational.gmt'))
-# genes.extend(get_genes_from_gmt(input_file_name='9606-bp-all.gmt'))
+genes.extend(get_genes_from_gmt(input_file_name=input_gmt_file))
 
 flatten = lambda l: [item for sublist in l for item in sublist]
 flattened = flatten(genes)
-print("output flattened \n")
 
-print("OUTPUT GENES\n")
+print("OUTPUT GENES")
 print("gene sets: " + str(len(genes)))
 print("gene list: " + str(len(flattened)))
 
@@ -118,10 +106,5 @@ print("UNIQUE GENES: " + str(len(unique_genes)))
 flattened_conversion_map = do_conversion(genes=unique_genes)
 
 print("KEYS IN CONVERSION MAP: " + str(len(flattened_conversion_map.keys())))
-# print(flattened_conversion_map)
-# print("the key? -> " + " ".join(flattened_conversion_map.keys()))
 
-convert_gmt_uniprots(input_file_name='test1.gmt', conversion_map=flattened_conversion_map)
-# convert_gmt_uniprots(input_file_name='9606-bp-experimental.gmt', conversion_map=flattened_conversion_map)
-# convert_gmt_uniprots(input_file_name='9606-bp-computational.gmt', conversion_map=flattened_conversion_map)
-# convert_gmt_uniprots(input_file_name='9606-bp-all.gmt', conversion_map=flattened_conversion_map)
+convert_gmt_uniprots(input_file_name=input_gmt_file, conversion_map=flattened_conversion_map)
