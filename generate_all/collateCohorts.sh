@@ -22,8 +22,9 @@ do
    #Rscript ../analysis-wrapper.R  $1  TCGA-${COHORT}_tpm_tab.tsv $1-genesets-${COHORT}.tsv
    head -1 h.all.v7.1.symbols.gmt-genesets-${COHORT}.tsv > collated-genesets-${COHORT}.tsv
    tail -n +2 h.all.v7.1.symbols.gmt-genesets-${COHORT}.tsv >> collated-genesets-${COHORT}.tsv
-   tail -n +2 9606-bp-experimental.gmt_converted.tsv-genesets-${COHORT}.tsv >> collated-genesets-${COHORT}.tsv
-   tail -n +2 9606-bp-computational.gmt_converted.tsv-genesets-${COHORT}.tsv >> collated-genesets-${COHORT}.tsv
+   
+   tail -n +2 9606-bp-experimental.gmt_converted.tsv-genesets-${COHORT}.tsv | sed 's/ (GO:/-experimental_only (GO:/'>> collated-genesets-${COHORT}.tsv
+   tail -n +2 9606-bp-computational.gmt_converted.tsv-genesets-${COHORT}.tsv| sed 's/ (GO:/-computational_only (GO:/' >> collated-genesets-${COHORT}.tsv
    tail -n +2 9606-bp-all.gmt_converted.tsv-genesets-${COHORT}.tsv >> collated-genesets-${COHORT}.tsv
 #   9606-bp-computational.gmt_converted.tsv-genesets-${COHORT}.tsv
 #   9606-bp-all.gmt_converted.tsv-genesets-${COHORT}.tsv
