@@ -6,6 +6,7 @@
       install.packages("plumber")
       install.packages("viper")
       install.packages("Rook")
+      install.packages("jsonlite")
 
 ### Analysis 
 

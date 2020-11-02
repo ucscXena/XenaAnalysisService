@@ -1,3 +1,7 @@
+library(jsonlite)
+library(stringr)
+suppressMessages(library(R.utils))
+
 # transform_tpm_to_gene_set_activity.R
 
 # Usage:
@@ -56,19 +60,50 @@ bpa_analysis <- function(req){
   print('output written')
   write("",outputFile)
   print('doing analysis')
-  print('file data')
-  print(formContents)
-  print('gmtdata :')
-  print(formContents$gmtdata)
+  #print('file data')
+  #print(formContents)
+  #print('gmtdata :')
+  #print(formContents$gmtdata)
+  #print('tpmfile:')
+  #print(formContents$tpmdata)
+
   if(formContents$input == 'text'){
+    print('handling text input')
     # let's be lazy and just write the input text to a file and read that
     gmtFileName <- tempfile()
     write(formContents$gmtdata,file=gmtFileName)
-    tpmFileName <- tempfile()
-    write(formContents$tmpFile,file=tpmFileName)
-    do_bpa_analysis(gmtFileName,tmpFileName,"output.csv")
+    #tpmFileName <- tempfile()
+
+
+    print('tpmData Raw')
+    print(formContents$tpmname)
+    print(formContents$tpmurl)
+
+
+
+    tpmFileName <-  paste(formContents$tpmname,".tpm",sep="",collapse="")
+    tpmFileNameCompress <- paste(tpmFileName,".gz",sep="",collapse="")
+
+    print("tpm filename")
+    print(tpmFileName)
+
+    ## TODO: look for local file with $tpmname
+    ## if file exists . . .
+
+
+    if(!file.exists(tpmFileName)){
+      input_url <- URLdecode(formContents$tpmurl)
+      download.file(input_url, tpmFileNameCompress)
+      gunzip(tpmFileNameCompress)
+    }
+    # NOTE: we'll have to do two of these and return two of these, or maybe we submit two analyses . . .
+    print("doing analysis")
+    do_bpa_analysis(gmtFileName,tpmFileName,"output.csv")
+    print("DID analysis")
+
   }
   else{
+    print('handling file input')
     do_bpa_analysis(formContents$gmtdata$tempfile,formContents$tpmdata$tempfile,"output.csv")
   }
   outputText <- read.csv(outputFile)
