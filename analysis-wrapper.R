@@ -31,20 +31,31 @@
 #tmp_expr_data_filepath <- args[2]
 #outfile <- args[3]
 
-#* @param msg The message to echo
-#curl -v -F foo=bar -F upload=@test-data/Xena_manual_pathways.gmt http://localhost:8000/echo
-#* @get /echo
-function(msg=""){
-  list(msg = paste0("The message is: '", msg, "'"))
+#* @filter cors
+cors <- function(req,res) {
+  print("pre-emptying with cors")
+  res$setHeader("Access-Control-Allow-Origin", "*")
+
+  if (req$REQUEST_METHOD == "OPTIONS") {
+    res$setHeader("Access-Control-Allow-Methods","*")
+    res$setHeader("Access-Control-Allow-Headers", req$HTTP_ACCESS_CONTROL_REQUEST_HEADERS)
+    res$status <- 200
+    return(list())
+  } else {
+    plumber::forward()
+  }
+  print("forwarded")
 }
 
-#* @param msg The message to echo
 #curl -v -F tpmdata=@test-data/TCGA-CHOL_logtpm_forTesting.tsv -F gmtdata=@test-data/Xena_manual_pathways.gmt http://localhost:8000/bpa_analysis
-#' @post /bpa_analysis
-function(req){
+#* @post /bpa_analysis
+bpa_analysis <- function(req){
+  print('doing bpa_analysis')
   formContents <- Rook::Multipart$parse(req)
   outputFile<-file("output.csv")
+  print('output written')
   write("",outputFile)
+  print('doing analysis')
   do_bpa_analysis(formContents$gmtdata$tempfile,formContents$tpmdata$tempfile,"output.csv")
   outputText <- read.csv(outputFile)
   list(msg = outputText)
@@ -54,7 +65,7 @@ do_bpa_analysis <- function(geneset_gmt_filepath,tmp_expr_data_filepath,outfile)
 
   # only load viper package if method 'BPA' is used
   library(viper)
-  
+
   # read in pathways and bring into right format for viper aREA function
   pws_list <- list()
   pws <- readLines(geneset_gmt_filepath)
@@ -66,11 +77,11 @@ do_bpa_analysis <- function(geneset_gmt_filepath,tmp_expr_data_filepath,outfile)
       gs_name <- paste0(gs_name," (",gs_description,")")
     }
     gs_genes <- linesplit[3:length(linesplit),drop = F]
-    
+
     likelihood <- rep(1,times=length(gs_genes))
     tfmode <- rep(1,times=length(gs_genes))
     names(tfmode) <- gs_genes
-    
+
     gs_list <- list(tfmode = tfmode,likelihood = likelihood)
     pws_list[[gs_name]] <- gs_list
   }
@@ -102,6 +113,3 @@ if( length(args)>2){
   }
   do_bpa_analysis(geneset_gmt_filepath,tmp_expr_data_filepath,outfile )
 }
-#
-#
-#
