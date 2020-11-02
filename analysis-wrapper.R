@@ -56,6 +56,7 @@ bpa_analysis <- function(req){
   print('output written')
   write("",outputFile)
   print('doing analysis')
+  print('file data:',formContents)
   do_bpa_analysis(formContents$gmtdata$tempfile,formContents$tpmdata$tempfile,"output.csv")
   outputText <- read.csv(outputFile)
   list(msg = outputText)
