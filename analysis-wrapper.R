@@ -79,28 +79,37 @@ bpa_analysis <- function(req){
 
     print("output file name")
     print(outputFileName)
+    if(!file.exists(outputFileName)){
+      if(!file.exists(tpmFileName)){
+        input_url <- URLdecode(formContents$tpmurl)
+        download.file(input_url, tpmFileNameCompress)
+        gunzip(tpmFileNameCompress)
+      }
+      # NOTE: we'll have to do two of these and return two of these, or maybe we submit two analyses . . .
+      print("doing analysis")
+      # write an empty file out
+      outputFile<-file(outputFileName)
+      write("",outputFile)
+      do_bpa_analysis(gmtFileName,tpmFileName,outputFileName)
+      print("DID analysis")
 
-    if(!file.exists(tpmFileName)){
-      input_url <- URLdecode(formContents$tpmurl)
-      download.file(input_url, tpmFileNameCompress)
-      gunzip(tpmFileNameCompress)
     }
-    # NOTE: we'll have to do two of these and return two of these, or maybe we submit two analyses . . .
-    print("doing analysis")
-    outputFile<-file(outputFileName)
-    write("",outputFile)
-    do_bpa_analysis(gmtFileName,tpmFileName,outputFileName)
-    print("DID analysis")
+    else{
+      print("file exists, returning ")
+      print(outputFileName)
+      outputFile<-file(outputFileName)
+    }
 
   }
   else{
     print('handling file input')
+    # write an empty file out
     outputFile<-file(outputFileName)
     write("",outputFile)
     do_bpa_analysis(formContents$gmtdata$tempfile,formContents$tpmdata$tempfile,outputFileName)
   }
   outputText <- read.csv(outputFile, sep = "\t")
-  print(outputText)
+  #print(outputText)
   list(outputText)
 }
 
