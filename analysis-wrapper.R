@@ -1,6 +1,7 @@
 library(viper)
 library(jsonlite)
 library(stringr)
+library(digest)
 suppressMessages(library(R.utils))
 
 # transform_tpm_to_gene_set_activity.R
@@ -57,15 +58,11 @@ cors <- function(req,res) {
 bpa_analysis <- function(req){
   print('doing bpa_analysis')
   formContents <- Rook::Multipart$parse(req)
-  outputFile<-file("output.csv")
-  print('output written')
-  write("",outputFile)
-  print('handling for input ')
-  print(formContents$input)
   input <- formContents$input
 
+  outputFileName <- "output.tsv"
   if(!is.null(input) && input  == 'text'){
-    print('handling text input')
+    print('handling web text input')
 
     # let's be lazy and just write the input text to a file and read that
     gmtFileName <- tempfile()
@@ -75,6 +72,10 @@ bpa_analysis <- function(req){
 
     tpmFileName <-  paste(formContents$tpmname,".tpm",sep="",collapse="")
     tpmFileNameCompress <- paste(tpmFileName,".gz",sep="",collapse="")
+    gmtDigest <- digest(formContents$gmtdata, "md5", serialize = FALSE)
+    outputFileName <- paste("output-",formContents$tpmname,gmtDigest,".tsv",sep="",collapse="")
+    print("output file name")
+    print(outputFileName)
 
     ## TODO: look for local file with $tpmname
     ## if file exists . . .
@@ -87,15 +88,20 @@ bpa_analysis <- function(req){
     }
     # NOTE: we'll have to do two of these and return two of these, or maybe we submit two analyses . . .
     print("doing analysis")
-    do_bpa_analysis(gmtFileName,tpmFileName,"output.csv")
+    outputFile<-file(outputFileName)
+    write("",outputFile)
+    do_bpa_analysis(gmtFileName,tpmFileName,outputFileName)
     print("DID analysis")
 
   }
   else{
     print('handling file input')
-    do_bpa_analysis(formContents$gmtdata$tempfile,formContents$tpmdata$tempfile,"output.csv")
+    outputFile<-file(outputFileName)
+    write("",outputFile)
+    do_bpa_analysis(formContents$gmtdata$tempfile,formContents$tpmdata$tempfile,outputFileName)
   }
-  outputText <- read.csv(outputFile)
+  outputText <- read.csv(outputFile, sep = "\t")
+  print(outputText)
   list(msg = outputText)
 }
 
