@@ -66,23 +66,15 @@ bpa_analysis <- function(req){
 
   if(!is.null(input) && input  == 'text'){
     print('handling text input')
+
     # let's be lazy and just write the input text to a file and read that
     gmtFileName <- tempfile()
-    write(formContents$gmtdata,file=gmtFileName)
-    #tpmFileName <- tempfile()
-
-
-    print('tpmData Raw')
-    print(formContents$tpmname)
-    print(formContents$tpmurl)
-
-
+    #decodedGmtData <- gsub("\t","  ",URLdecode(formContents$gmtdata))
+    decodedGmtData <- URLdecode(formContents$gmtdata)
+    write(decodedGmtData,file=gmtFileName)
 
     tpmFileName <-  paste(formContents$tpmname,".tpm",sep="",collapse="")
     tpmFileNameCompress <- paste(tpmFileName,".gz",sep="",collapse="")
-
-    print("tpm filename")
-    print(tpmFileName)
 
     ## TODO: look for local file with $tpmname
     ## if file exists . . .
