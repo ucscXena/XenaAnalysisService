@@ -74,12 +74,11 @@ bpa_analysis <- function(req){
     tpmFileNameCompress <- paste(tpmFileName,".gz",sep="",collapse="")
     gmtDigest <- digest(formContents$gmtdata, "md5", serialize = FALSE)
     outputFileName <- paste("output-",formContents$tpmname,gmtDigest,".tsv",sep="",collapse="")
+
+    # TODO if this file analysis file exists, just return it without doing the analysis
+
     print("output file name")
     print(outputFileName)
-
-    ## TODO: look for local file with $tpmname
-    ## if file exists . . .
-
 
     if(!file.exists(tpmFileName)){
       input_url <- URLdecode(formContents$tpmurl)
@@ -102,7 +101,7 @@ bpa_analysis <- function(req){
   }
   outputText <- read.csv(outputFile, sep = "\t")
   print(outputText)
-  list(msg = outputText)
+  list(outputText)
 }
 
 do_bpa_analysis <- function(geneset_gmt_filepath,tmp_expr_data_filepath,outfile){
