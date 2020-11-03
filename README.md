@@ -7,6 +7,8 @@
       install.packages("viper")
       install.packages("Rook")
       install.packages("jsonlite")
+      install.packages("R.utils")
+      install.packages("stringr")
 
 ### Analysis 
 
