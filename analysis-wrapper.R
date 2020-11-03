@@ -1,3 +1,4 @@
+library(viper)
 library(jsonlite)
 library(stringr)
 suppressMessages(library(R.utils))
@@ -59,15 +60,11 @@ bpa_analysis <- function(req){
   outputFile<-file("output.csv")
   print('output written')
   write("",outputFile)
-  print('doing analysis')
-  #print('file data')
-  #print(formContents)
-  #print('gmtdata :')
-  #print(formContents$gmtdata)
-  #print('tpmfile:')
-  #print(formContents$tpmdata)
+  print('handling for input ')
+  print(formContents$input)
+  input <- formContents$input
 
-  if(formContents$input == 'text'){
+  if(!is.null(input) && input  == 'text'){
     print('handling text input')
     # let's be lazy and just write the input text to a file and read that
     gmtFileName <- tempfile()
@@ -113,9 +110,15 @@ bpa_analysis <- function(req){
 do_bpa_analysis <- function(geneset_gmt_filepath,tmp_expr_data_filepath,outfile){
 
   # only load viper package if method 'BPA' is used
-  library(viper)
 
   # read in pathways and bring into right format for viper aREA function
+
+  print("gmt filepath")
+  print(geneset_gmt_filepath)
+
+  print("tpm filepath")
+  print(tmp_expr_data_filepath)
+
   pws_list <- list()
   pws <- readLines(geneset_gmt_filepath)
   for(line in pws){
